@@ -9,7 +9,7 @@
 
 | Microservicio | Patrones Principales | Patrones Secundarios |
 |---------------|---------------------|---------------------|
-| **customer-service** | Active Record | Reactive, Soft Delete, DTO |
+| **customer-service** | Active Record | Reactive, DTO |
 | **account-service** | Repository | Reactive, Domain Model, @WithTransaction |
 | **transaction-service** | Orchestrator, Saga, Circuit Breaker | API Composite, Repository, REST Client, Event Producer, Reactive |
 | **bcrp-simulator** | Mock/Simulator | REST Client, Facade |
