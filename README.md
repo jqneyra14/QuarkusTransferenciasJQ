@@ -144,8 +144,7 @@
 │  🎯 Patrones Implementados:                                  │
 │     ✅ Active Record Pattern (Principal)                     │
 │     ✅ Reactive Programming (Uni, Multi)                     │
-│     ✅ Soft Delete Pattern                                   │
-│     ✅ DTO Pattern                                           │
+│                                                                    │
 │                                                              │
 │  🧩 Componentes:                                             │
 │     • CustomerEntity (extends PanacheEntityBase)             │
@@ -324,7 +323,7 @@
 │  🎯 Patrones Implementados:                                  │
 │     ✅ Mock/Simulator Pattern (Principal)                    │
 │     ✅ REST Client Pattern                                   │
-│     ✅ Facade Pattern                                        │
+                                    │
 │                                                              │
 │  🧩 Componentes:                                             │
 │     • BcrpResource (REST API)                                │
