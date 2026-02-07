@@ -3,7 +3,7 @@ quarkus:
     name: api-gateway
 
   http:
-    port: 8080  # Puerto único para todo el sistema
+    port: 8080
     cors:
       ~: true
       origins: "*"
@@ -15,25 +15,19 @@ quarkus:
     path: /swagger-ui
     title: API Gateway - Sistema BCRP
 
-# Configuración de REST Clients para cada microservicio
-quarkus:
   rest-client:
     customer-service:
-      url: http://localhost:8083
+      url: http://customer-service:8083
       scope: jakarta.inject.Singleton
-    
     account-service:
-      url: http://localhost:8085
+      url: http://account-service:8085
       scope: jakarta.inject.Singleton
-    
     transaction-service:
-      url: http://localhost:8084
+      url: http://transaction-service:8084
       scope: jakarta.inject.Singleton
-    
     bcrp-service:
-      url: http://localhost:8086
+      url: http://bcrp-simulator:8086
       scope: jakarta.inject.Singleton
-    
     audit-service:
-      url: http://localhost:8088
+      url: http://audit-service:8088
       scope: jakarta.inject.Singleton

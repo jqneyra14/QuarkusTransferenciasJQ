@@ -12,7 +12,7 @@ quarkus:
     username: admin
     password: "123456"
     reactive:
-      url: postgresql://localhost:5432/audit_db
+      url: postgresql://postgres:5432/audit_db
       max-size: 20
 
   hibernate-orm:
@@ -25,7 +25,6 @@ quarkus:
     always-include: true
     path: /swagger-ui
 
-# Configuración Kafka Consumer (SOLO INCOMING)
 mp:
   messaging:
     incoming:
@@ -40,4 +39,4 @@ mp:
 
 kafka:
   bootstrap:
-    servers: localhost:9092
+    servers: kafka:9092

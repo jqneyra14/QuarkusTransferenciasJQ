@@ -1,0 +1,206 @@
+version: '3.8'
+
+services:
+  # ========== INFRAESTRUCTURA ==========
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_bcrp
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    networks:
+      - bcrp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_bcrp
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@bcrp.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "9090:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bcrp-network
+      
+      
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper_bcrp
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - bcrp-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka_bcrp
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - bcrp-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ========== MICROSERVICIOS ==========
+  
+  customer-service:
+    build:
+      context: ./customer-service
+      dockerfile: Dockerfile
+    container_name: customer-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/customer_db
+      QUARKUS_DATASOURCE_USERNAME: admin
+      QUARKUS_DATASOURCE_PASSWORD: 123456
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+  account-service:
+    build:
+      context: ./account-service
+      dockerfile: Dockerfile
+    container_name: account-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/account_db
+      QUARKUS_DATASOURCE_USERNAME: admin
+      QUARKUS_DATASOURCE_PASSWORD: 123456
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+  transaction-service:
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    container_name: transaction-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      account-service:
+        condition: service_started
+      customer-service:
+        condition: service_started
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/transaction_db
+      QUARKUS_DATASOURCE_USERNAME: admin
+      QUARKUS_DATASOURCE_PASSWORD: 123456
+      QUARKUS_REST_CLIENT_ACCOUNT_SERVICE_URL: http://account-service:8085
+      QUARKUS_REST_CLIENT_CUSTOMER_SERVICE_URL: http://customer-service:8083
+      QUARKUS_REST_CLIENT_BCRP_SERVICE_URL: http://bcrp-simulator:8086
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+  bcrp-simulator:
+    build:
+      context: ./bcrp-simulator-service
+      dockerfile: Dockerfile
+    container_name: bcrp-simulator
+    ports:
+      - "8086:8086"
+    depends_on:
+      transaction-service:
+        condition: service_started
+    environment:
+      QUARKUS_REST_CLIENT_TRANSACTION_SERVICE_URL: http://transaction-service:8084
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+  audit-service:
+    build:
+      context: ./audit-service
+      dockerfile: Dockerfile
+    container_name: audit-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/audit_db
+      QUARKUS_DATASOURCE_USERNAME: admin
+      QUARKUS_DATASOURCE_PASSWORD: 123456
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - customer-service
+      - account-service
+      - transaction-service
+      - bcrp-simulator
+      - audit-service
+    environment:
+      QUARKUS_REST_CLIENT_CUSTOMER_SERVICE_URL: http://customer-service:8083
+      QUARKUS_REST_CLIENT_ACCOUNT_SERVICE_URL: http://account-service:8085
+      QUARKUS_REST_CLIENT_TRANSACTION_SERVICE_URL: http://transaction-service:8084
+      QUARKUS_REST_CLIENT_BCRP_SERVICE_URL: http://bcrp-simulator:8086
+      QUARKUS_REST_CLIENT_AUDIT_SERVICE_URL: http://audit-service:8088
+    networks:
+      - bcrp-network
+    restart: on-failure
+
+# ========== VOLÚMENES ==========
+
+volumes:
+  postgres_data:
+
+# ========== REDES ==========
+
+networks:
+  bcrp-network:
+    driver: bridge

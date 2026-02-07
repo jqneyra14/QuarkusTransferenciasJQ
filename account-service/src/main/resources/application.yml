@@ -12,12 +12,13 @@ quarkus:
     username: admin
     password: "123456"
     reactive:
-      url: postgresql://localhost:5432/account_db
+      #url: postgresql://localhost:5432/account_db
+      url: postgresql://postgres:5432/account_db
       max-size: 20
 
   hibernate-orm:
     database:
-      generation: drop-and-create
+      generation: update
     log:
       sql: true
 

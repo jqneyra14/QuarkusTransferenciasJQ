@@ -12,12 +12,12 @@ quarkus:
     username: admin
     password: "123456"
     reactive:
-      url: postgresql://localhost:5432/transaction_db
+      url: postgresql://postgres:5432/transaction_db
       max-size: 20
 
   hibernate-orm:
     database:
-      generation: drop-and-create
+      generation: update
     log:
       sql: true
 
@@ -25,19 +25,17 @@ quarkus:
     always-include: true
     path: /swagger-ui
 
-  # REST Clients para llamar a otros microservicios
   rest-client:
     account-service:
-      url: http://localhost:8085
+      url: http://account-service:8085
       scope: jakarta.inject.Singleton
     customer-service:
-      url: http://localhost:8083
+      url: http://customer-service:8083
       scope: jakarta.inject.Singleton
     bcrp-service:
-      url: http://localhost:8086
+      url: http://bcrp-simulator:8086
       scope: jakarta.inject.Singleton
 
-# Configuración Kafka (publicar eventos de auditoría)
 mp:
   messaging:
     outgoing:
@@ -45,9 +43,8 @@ mp:
         connector: smallrye-kafka
         topic: audit-events
         value:
-          serializer: io.quarkus.kafka.client.serialization.ObjectMapperSerializer
+          serializer: org.apache.kafka.common.serialization.StringSerializer
 
-# Kafka broker (por ahora comentado, lo activamos después)
 kafka:
   bootstrap:
-    servers: localhost:9092
+    servers: kafka:9092

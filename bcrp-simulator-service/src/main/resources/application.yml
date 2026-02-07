@@ -11,5 +11,5 @@ quarkus:
 
   rest-client:
     transaction-service:
-      url: http://localhost:8084
+      url: http://transaction-service:8084
       scope: jakarta.inject.Singleton

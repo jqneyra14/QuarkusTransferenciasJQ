@@ -14,7 +14,8 @@ quarkus:
     username: admin
     password: "123456"
     reactive:
-      url: postgresql://localhost:5432/customer_db
+     # url: postgresql://localhost:5432/customer_db
+      url: 'postgresql://postgres:5432/customer_db'
       max-size: 20
 
   hibernate-orm:
