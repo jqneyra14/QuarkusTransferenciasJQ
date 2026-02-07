@@ -1,0 +1,37 @@
+name: db_MSQuakusReactive_Dev
+
+services:
+  postgres_db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: customer_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db_net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jqneyra14@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    ports:
+      - "9090:80"
+    depends_on:
+      - postgres_db
+    networks:
+      - db_net
+volumes:
+  postgres_data:
+
+networks:
+  db_net:
+    driver: bridge

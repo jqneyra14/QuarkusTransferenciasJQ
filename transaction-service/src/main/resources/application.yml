@@ -1,0 +1,53 @@
+quarkus:
+  application:
+    name: transaction-service
+
+  http:
+    port: 8084
+
+  datasource:
+    devservices:
+      enabled: false
+    db-kind: postgresql
+    username: admin
+    password: "123456"
+    reactive:
+      url: postgresql://localhost:5432/transaction_db
+      max-size: 20
+
+  hibernate-orm:
+    database:
+      generation: drop-and-create
+    log:
+      sql: true
+
+  swagger-ui:
+    always-include: true
+    path: /swagger-ui
+
+  # REST Clients para llamar a otros microservicios
+  rest-client:
+    account-service:
+      url: http://localhost:8085
+      scope: jakarta.inject.Singleton
+    customer-service:
+      url: http://localhost:8083
+      scope: jakarta.inject.Singleton
+    bcrp-service:
+      url: http://localhost:8086
+      scope: jakarta.inject.Singleton
+
+# Configuración Kafka (publicar eventos de auditoría)
+mp:
+  messaging:
+    outgoing:
+      audit-events:
+        connector: smallrye-kafka
+        topic: audit-events
+        value:
+          serializer: io.quarkus.kafka.client.serialization.ObjectMapperSerializer
+
+# Kafka broker (por ahora comentado, lo activamos después)
+kafka:
+  bootstrap:
+    servers: localhost:9092

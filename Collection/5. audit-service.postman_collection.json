@@ -1,0 +1,85 @@
+{
+	"info": {
+		"_postman_id": "audit-service-001",
+		"name": "Audit Service - BCRP Microservices",
+		"description": "Servicio de auditoría - Kafka Consumer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Listar Todos los Logs de Auditoría",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/audit",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8088",
+					"path": ["api", "audit"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Buscar Logs por Evento - ABONO_PROCESADO",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/audit/evento/ABONO_PROCESADO",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8088",
+					"path": ["api", "audit", "evento", "ABONO_PROCESADO"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Buscar Logs por Evento - ABONO_REVERTIDO",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/audit/evento/ABONO_REVERTIDO",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8088",
+					"path": ["api", "audit", "evento", "ABONO_REVERTIDO"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Buscar Logs por Referencia",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/audit/referencia/TRANSF-001",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8088",
+					"path": ["api", "audit", "referencia", "TRANSF-001"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Buscar Logs por Cuenta",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/audit/cuenta/1234567890",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8088",
+					"path": ["api", "audit", "cuenta", "1234567890"]
+				}
+			},
+			"response": []
+		}
+	]
+}

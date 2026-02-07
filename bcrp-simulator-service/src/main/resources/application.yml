@@ -1,0 +1,15 @@
+quarkus:
+  application:
+    name: bcrp-simulator-service
+
+  http:
+    port: 8086
+
+  swagger-ui:
+    always-include: true
+    path: /swagger-ui
+
+  rest-client:
+    transaction-service:
+      url: http://localhost:8084
+      scope: jakarta.inject.Singleton

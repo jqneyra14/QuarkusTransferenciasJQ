@@ -1,0 +1,43 @@
+quarkus:
+  application:
+    name: audit-service
+
+  http:
+    port: 8088
+
+  datasource:
+    devservices:
+      enabled: false
+    db-kind: postgresql
+    username: admin
+    password: "123456"
+    reactive:
+      url: postgresql://localhost:5432/audit_db
+      max-size: 20
+
+  hibernate-orm:
+    database:
+      generation: update
+    log:
+      sql: true
+
+  swagger-ui:
+    always-include: true
+    path: /swagger-ui
+
+# Configuración Kafka Consumer (SOLO INCOMING)
+mp:
+  messaging:
+    incoming:
+      audit-events:
+        connector: smallrye-kafka
+        topic: audit-events
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        auto:
+          offset:
+            reset: earliest
+
+kafka:
+  bootstrap:
+    servers: localhost:9092

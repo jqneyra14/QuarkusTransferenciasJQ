@@ -1,0 +1,26 @@
+quarkus:
+  application:
+    name: account-service
+
+  http:
+    port: 8085
+
+  datasource:
+    devservices:
+      enabled: false
+    db-kind: postgresql
+    username: admin
+    password: "123456"
+    reactive:
+      url: postgresql://localhost:5432/account_db
+      max-size: 20
+
+  hibernate-orm:
+    database:
+      generation: drop-and-create
+    log:
+      sql: true
+
+  swagger-ui:
+    always-include: true
+    path: /swagger-ui
